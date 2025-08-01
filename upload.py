@@ -174,12 +174,15 @@ async def process_meta(meta, base_dir, bot=None):
     with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/meta.json", 'w') as f:
         json.dump(meta, f, indent=4)
         f.close()
+    editargs_tracking = ()
     confirm = await helper.get_confirmation(meta)
     while confirm is False:
         editargs = cli_ui.ask_string("Input args that need correction e.g. (--tag NTb --category tv --tmdb 12345)")
         editargs = tuple(editargs.split())
+        # Tracks multiple edits
+        editargs_tracking = editargs_tracking + editargs
         # Carry original args over, let parse handle duplicates
-        meta, help, before_args = parser.parse(tuple(' '.join(sys.argv[1:]).split(' ')) + editargs, meta)
+        meta, help, before_args = parser.parse(tuple(' '.join(sys.argv[1:]).split(' ')) + editargs_tracking, meta)
         if isinstance(meta.get('trackers'), str):
             if "," in meta['trackers']:
                 meta['trackers'] = [t.strip() for t in meta['trackers'].split(',')]
