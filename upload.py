@@ -177,12 +177,9 @@ async def process_meta(meta, base_dir, bot=None):
     confirm = await helper.get_confirmation(meta)
     while confirm is False:
         editargs = cli_ui.ask_string("Input args that need correction e.g. (--tag NTb --category tv --tmdb 12345)")
-        editargs = (meta['path'],) + tuple(editargs.split())
-        if meta.get('debug', False):
-            editargs += ("--debug",)
-        if meta.get('trackers', None) is not None:
-            editargs += ("--trackers", ",".join(meta["trackers"]))
-        meta, help, before_args = parser.parse(editargs, meta)
+        editargs = tuple(editargs.split())
+        # Carry original args over, let parse handle duplicates
+        meta, help, before_args = parser.parse(tuple(' '.join(sys.argv[1:]).split(' ')) + editargs, meta)
         if isinstance(meta.get('trackers'), str):
             if "," in meta['trackers']:
                 meta['trackers'] = [t.strip() for t in meta['trackers'].split(',')]
