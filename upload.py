@@ -185,9 +185,11 @@ async def process_meta(meta, base_dir, bot=None):
         meta, help, before_args = parser.parse(tuple(' '.join(sys.argv[1:]).split(' ')) + editargs_tracking, meta)
         if isinstance(meta.get('trackers'), str):
             if "," in meta['trackers']:
-                meta['trackers'] = [t.strip() for t in meta['trackers'].split(',')]
+                meta['trackers'] = [t.strip().upper() for t in meta['trackers'].split(',')]
             else:
-                meta['trackers'] = [meta['trackers']]
+                meta['trackers'] = [meta['trackers'].strip().upper()]
+        elif isinstance(meta.get('trackers'), list):
+            meta['trackers'] = [t.strip().upper() for t in meta['trackers'] if isinstance(t, str)]
         meta['edit'] = True
         meta = await prep.gather_prep(meta=meta, mode='cli')
         meta['name_notag'], meta['name'], meta['clean_name'], meta['potential_missing'] = await get_name(meta)
